@@ -66,10 +66,6 @@ export default {
       this.product = { ...product };
       this.productDialog = true;
     },
-    confirmDeleteProduct(product) {
-      this.product = product;
-      this.deleteProductDialog = true;
-    },
     deleteProduct() {
       this.products = this.products.filter(val => val.id !== this.product.id);
       this.deleteProductDialog = false;
@@ -124,40 +120,23 @@ export default {
           <template #start>
             <div class="my-2">
               <Button label="New" icon="pi pi-plus" class="p-button-success mr-2" @click="openNew" />
-              <Button
-                label="Delete" icon="pi pi-trash" class="p-button-danger"
-                :disabled="!selectedProducts || !selectedProducts.length"
-                @click="confirmDeleteSelected"
-              />
+              <Button label="Delete" icon="pi pi-trash" class="p-button-danger"
+                :disabled="!selectedProducts || !selectedProducts.length" @click="confirmDeleteSelected" />
             </div>
           </template>
 
           <template #end>
-            <FileUpload
-              mode="basic"
-              accept="image/*"
-              :max-file-size="1000000"
-              label="Import"
-              choose-label="Import"
-              class="mr-2 inline-block"
-            />
+            <FileUpload mode="basic" accept="image/*" :max-file-size="1000000" label="Import" choose-label="Import"
+              class="mr-2 inline-block" />
             <Button label="Export" icon="pi pi-upload" class="p-button-help" @click="exportCSV($event)" />
           </template>
         </Toolbar>
 
-        <DataTable
-          ref="dt"
-          v-model:selection="selectedProducts"
-          :value="products"
-          data-key="id"
-          :paginator="true"
-          :rows="10"
-          :filters="filters"
+        <DataTable ref="dt" v-model:selection="selectedProducts" :value="products" data-key="id" :paginator="true"
+          :rows="10" :filters="filters"
           paginator-template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
           :rows-per-page-options="[5, 10, 25]"
-          current-page-report-template="Showing {first} to {last} of {totalRecords} products"
-          responsive-layout="scroll"
-        >
+          current-page-report-template="Showing {first} to {last} of {totalRecords} products" responsive-layout="scroll">
           <template #header>
             <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
               <h5 class="m-0">
@@ -170,13 +149,7 @@ export default {
             </div>
           </template>
 
-          <Column selection-mode="multiple" header-style="width: 3rem" />
-          <Column field="code" header="Code" :sortable="true">
-            <template #body="slotProps">
-              <span class="p-column-title">Code</span>
-              {{ slotProps.data.code }}
-            </template>
-          </Column>
+
           <Column field="name" header="Name" :sortable="true">
             <template #body="slotProps">
               <span class="p-column-title">Name</span>
@@ -186,13 +159,8 @@ export default {
           <Column header="Image">
             <template #body="slotProps">
               <span class="p-column-title">Image</span>
-              <img :src="`/images/product/${slotProps.data.image}`" :alt="slotProps.data.image" class="shadow-2" width="100">
-            </template>
-          </Column>
-          <Column field="price" header="Price" :sortable="true">
-            <template #body="slotProps">
-              <span class="p-column-title">Price</span>
-              {{ formatCurrency(slotProps.data.price) }}
+              <img :src="`/images/product/${slotProps.data.image}`" :alt="slotProps.data.image" class="shadow-2"
+                width="100">
             </template>
           </Column>
           <Column field="category" header="Category" :sortable="true">
@@ -210,53 +178,41 @@ export default {
           <Column field="inventoryStatus" header="Status" :sortable="true">
             <template #body="slotProps">
               <span class="p-column-title">Status</span>
-              <span :class="`product-badge status-${slotProps.data.inventoryStatus ? slotProps.data.inventoryStatus.toLowerCase() : ''}`">{{ slotProps.data.inventoryStatus }}</span>
+              <span
+                :class="`product-badge status-${slotProps.data.inventoryStatus ? slotProps.data.inventoryStatus.toLowerCase() : ''}`">{{
+                  slotProps.data.inventoryStatus }}</span>
             </template>
           </Column>
           <Column>
             <template #body="slotProps">
-              <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" @click="editProduct(slotProps.data)" />
-              <Button icon="pi pi-trash" class="p-button-rounded p-button-warning" @click="confirmDeleteProduct(slotProps.data)" />
+              <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
+                @click="editProduct(slotProps.data)" />
+              <Button icon="pi pi-trash" class="p-button-rounded p-button-warning"
+                @click="confirmDeleteProduct(slotProps.data)" />
             </template>
           </Column>
         </DataTable>
 
-        <Dialog
-          v-model:visible="productDialog" :style="{ width: '450px' }" header="Product Details"
-          :modal="true"
-          class="p-fluid"
-        >
-          <img
-            v-if="product.image" :src="`/images/product/${product.image}`" :alt="product.image"
-            width="150"
-            class="mt-0 mx-auto mb-5 block shadow-2"
-          >
+        <Dialog v-model:visible="productDialog" :style="{ width: '450px' }" header="Product Details" :modal="true"
+          class="p-fluid">
+          <img v-if="product.image" :src="`/images/product/${product.image}`" :alt="product.image" width="150"
+            class="mt-0 mx-auto mb-5 block shadow-2">
           <div class="field">
             <label for="name">Name</label>
-            <InputText
-              id="name" v-model.trim="product.name" required="true"
-              autofocus
-              :class="{ 'p-invalid': submitted && !product.name }"
-            />
+            <InputText id="name" v-model.trim="product.name" required="true" autofocus
+              :class="{ 'p-invalid': submitted && !product.name }" />
             <small v-if="submitted && !product.name" class="p-invalid">Name is required.</small>
           </div>
           <div class="field">
             <label for="description">Description</label>
-            <Textarea
-              id="description" v-model="product.description" required="true"
-              rows="3"
-              cols="20"
-            />
+            <Textarea id="description" v-model="product.description" required="true" rows="3" cols="20" />
           </div>
 
           <div class="field">
             <label for="inventoryStatus" class="mb-3">Inventory Status</label>
             <ClientOnly>
-              <Dropdown
-                id="inventoryStatus" v-model="product.inventoryStatus" :options="statuses"
-                option-label="label"
-                placeholder="Select a Status"
-              >
+              <Dropdown id="inventoryStatus" v-model="product.inventoryStatus" :options="statuses" option-label="label"
+                placeholder="Select a Status">
                 <template #value="slotProps">
                   <div v-if="slotProps.value && slotProps.value.value">
                     <span :class="`product-badge status-${slotProps.value.value}`">{{ slotProps.value.label }}</span>
@@ -273,11 +229,11 @@ export default {
           </div>
 
           <div class="field">
-            <label class="mb-3">Category</label>
+            <label class="mb-3">Capital</label>
             <div class="formgrid grid">
               <div class="field-radiobutton col-6">
                 <RadioButton id="category1" v-model="product.category" name="category" value="Accessories" />
-                <label for="category1">Accessories</label>
+                <label for="category1">Capital</label>
               </div>
               <div class="field-radiobutton col-6">
                 <RadioButton id="category2" v-model="product.category" name="category" value="Clothing" />
@@ -297,11 +253,7 @@ export default {
           <div class="formgrid grid">
             <div class="field col">
               <label for="price">Price</label>
-              <InputNumber
-                id="price" v-model="product.price" mode="currency"
-                currency="USD"
-                locale="en-US"
-              />
+              <InputNumber id="price" v-model="product.price" mode="currency" currency="USD" locale="en-US" />
             </div>
             <div class="field col">
               <label for="quantity">Quantity</label>
@@ -341,27 +293,27 @@ export default {
 </template>
 
 <style scoped lang="scss">
-	.product-badge {
-		border-radius: 2px;
-		padding: .25em .5rem;
-		text-transform: uppercase;
-		font-weight: 700;
-		font-size: 12px;
-		letter-spacing: .3px;
+.product-badge {
+  border-radius: 2px;
+  padding: .25em .5rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: .3px;
 
-		&.status-instock {
-			background: #C8E6C9;
-			color: #256029;
-		}
+  &.status-instock {
+    background: #C8E6C9;
+    color: #256029;
+  }
 
-		&.status-outofstock {
-			background: #FFCDD2;
-			color: #C63737;
-		}
+  &.status-outofstock {
+    background: #FFCDD2;
+    color: #C63737;
+  }
 
-		&.status-lowstock {
-			background: #FEEDAF;
-			color: #8A5340;
-		}
-	}
+  &.status-lowstock {
+    background: #FEEDAF;
+    color: #8A5340;
+  }
+}
 </style>
